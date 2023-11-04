@@ -25,8 +25,9 @@ int main() {
 
 	const char* currentPath = "./assets/test.bmp";
 
-	BMPFile *bmpFile = readGrayscaleBMPFile(currentPath);
+	
 
+	BMPFile *bmpFile = readGrayscaleBMPFile(currentPath);
 	std::cout << "====================" << std::endl;
 
 	writeGrayscaleBMP("./assets/test3.bmp", *bmpFile);

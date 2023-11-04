@@ -39,6 +39,8 @@ struct BMPFile {
 
 #pragma pack(pop)
 
+void printOutHeader(const BMPHeader header);
 BMPFile* readGrayscaleBMPFile(const std::string& filePath);
 void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile);
 void printOutPixelData(const std::vector<uint8_t>& pixels);
+void printOutInfoHeader(const BMPInfoHeader infoHeader);

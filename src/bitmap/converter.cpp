@@ -2,6 +2,41 @@
 
 
 /**
+ * @brief Print out the BMP info header
+ * 
+ * @param header 
+ */
+void printOutHeader(const BMPHeader header) {
+    std::cout << "BMP Header" << std::endl;
+    std::cout << "Signature: " << header.bmpSignature[0] << header.bmpSignature[1] << std::endl;
+    std::cout << "File Size: " << header.fileSize << std::endl;
+    std::cout << "Reserved 1: " << header.reserved1 << std::endl;
+    std::cout << "Reserved 2: " << header.reserved2 << std::endl;
+    std::cout << "Data Offset: " << header.dataOffset << std::endl;
+}
+
+/**
+ * @brief Print out the info header
+ * 
+ * @param infoHeader 
+ */
+void printOutInfoHeader(const BMPInfoHeader infoHeader) {
+    std::cout << "BMP Info Header" << std::endl;
+    std::cout << "Header Size: " << infoHeader.headerSize << std::endl;
+    std::cout << "Image Width: " << infoHeader.width << std::endl;
+    std::cout << "Image Height: " << infoHeader.height << std::endl;
+    std::cout << "Planes: " << infoHeader.planes << std::endl;
+    std::cout << "Bits Per Pixel: " << infoHeader.bitsPerPixel << std::endl;
+    std::cout << "Compression: " << infoHeader.compression << std::endl;
+    std::cout << "Image Size: " << infoHeader.imageSize << std::endl;
+    std::cout << "X Pixels Per Meter: " << infoHeader.xResolution << std::endl;
+    std::cout << "Y Pixels Per Meter: " << infoHeader.yResolution << std::endl;
+    std::cout << "Total Colors: " << infoHeader.colorsUsed << std::endl;
+    std::cout << "Important Colors: " << infoHeader.importantColors << std::endl;
+
+}
+
+/**
  * @brief Printing out the pixel data
  * 
  * @param pixels 
@@ -54,6 +89,8 @@ BMPFile* readGrayscaleBMPFile(const std::string& filePath) {
     newBMPFile->pixels = pixels;
 
     printOutPixelData(newBMPFile->pixels);
+    printOutHeader(newBMPFile->bmpHeader);
+    printOutInfoHeader(newBMPFile->bmpInfoHeader);
 
     std::cout << "\nOpened file and read \n" << newBMPFile->pixels.size() << std::endl;
     return newBMPFile;
@@ -74,6 +111,8 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
     std::ofstream file(filePath, std::ios::binary);
 
     printOutPixelData(pixels);
+    printOutHeader(bmpHeader);
+    printOutInfoHeader(bmpInfoHeader);
     
     if (!file) {
         std::cerr << "Error opening file for writing!" << std::endl;
