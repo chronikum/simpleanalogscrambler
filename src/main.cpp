@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "./bitmap/converter.hpp"
+#include "./bitmap/bitmap.hpp"
 
 struct RGB {
 	int r;
@@ -7,19 +7,6 @@ struct RGB {
 	int b;
 };
 
-
-
-//std::vector<RGB> rgbPixels;
-
-//int expectedSize = pixels.size() / 3;
-
-//rgbPixels.resize(expectedSize); // resize the pixels vector to 256
-
-//for (int i = 0; i < pixels.size(); i += 3) {
-//	rgbPixels[i / 3].r = pixels[i];
-//	rgbPixels[i / 3].g = pixels[i + 1];
-//	rgbPixels[i / 3].b = pixels[i + 2];
-//}
 
 int main() {
 
@@ -29,6 +16,8 @@ int main() {
 
 	BMPFile *bmpFile = readGrayscaleBMPFile(currentPath);
 	std::cout << "====================" << std::endl;
+
+	bitmapScramber(bmpFile);
 
 	writeGrayscaleBMP("./assets/test3.bmp", *bmpFile);
 

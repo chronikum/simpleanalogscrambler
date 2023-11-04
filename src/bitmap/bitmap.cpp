@@ -1,5 +1,9 @@
-#include "converter.hpp"
-
+#include "bitmap.hpp"
+#include <iostream>     // std::cout
+#include <algorithm>    // std::shuffle
+#include <array>        // std::array
+#include <random>       // std::default_random_engine
+#include <chrono>       // std::chrono::system_clock
 
 /**
  * @brief Print out the BMP info header
@@ -146,4 +150,28 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
     std::cout << "\nSaved file with " << pixels.size() << " pixels." << std::endl;
 
     file.close();
+}
+
+/**
+ * @brief Scrample the pixels of a bitmap file
+ * 
+ * @param bmpFile 
+ */
+void bitmapScramber(BMPFile* bmpFile) {
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    // after reading the file, scramble the pixels line by line
+    int width = bmpFile->bmpInfoHeader.width;
+    int height = bmpFile->bmpInfoHeader.height;
+
+    for (int i = 0; i < height; i++) {
+        std::vector<uint8_t> line(width);
+        for (int j = 0; j < width; j++) {
+            line[j] = bmpFile->pixels[i * width + j];
+        }
+        // random shuffle
+        shuffle (line.begin(), line.end(), std::default_random_engine(seed));
+        for (int j = 0; j < width; j++) {
+            bmpFile->pixels[i * width + j] = line[j];
+        }
+    }
 }
