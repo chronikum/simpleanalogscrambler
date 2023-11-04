@@ -1,36 +1,15 @@
 #include "converter.hpp"
 
-#pragma pack(push, 1) // Ensure structure is packed tightly
-struct BMPHeader {
-    char bmpSignature[2];  // "BM"
-    uint32_t fileSize;
-    uint16_t reserved1;
-    uint16_t reserved2;
-    uint32_t dataOffset;   // Start position of pixel data
-};
-
-struct BMPInfoHeader {
-    uint32_t headerSize;
-    int32_t width;
-    int32_t height;
-    uint16_t planes;
-    uint16_t bitsPerPixel;
-    uint32_t compression;
-    uint32_t imageSize;
-    int32_t xResolution;
-    int32_t yResolution;
-    uint32_t colorsUsed;
-    uint32_t importantColors;
-};
-#pragma pack(pop)
 
 /**
  * @brief Reads a bitmap file from a file path
+ * - Does not allocate memory for the pixels. Please copy the return value to a allocated vector or array.
  * 
  * @param filePath 
  * @return std::vector<uint8_t> 
  */
-std::vector<uint8_t> readGrayscaleBMP(const std::string& filePath) {
+BMPFile* readGrayscaleBMPFile(const std::string& filePath) {
+
     std::ifstream file(filePath, std::ios::binary);
     BMPHeader bmpHeader;
     BMPInfoHeader bmpInfoHeader;
@@ -49,11 +28,6 @@ std::vector<uint8_t> readGrayscaleBMP(const std::string& filePath) {
         exit(1);
     }
 
-    if (bmpInfoHeader.bitsPerPixel != 8) {
-        std::cerr << "Not a grayscale BMP!" << std::endl;
-        exit(1);
-    }
-
     // Move the file pointer to the beginning of the pixel data
     file.seekg(bmpHeader.dataOffset);
 
@@ -61,6 +35,41 @@ std::vector<uint8_t> readGrayscaleBMP(const std::string& filePath) {
     std::vector<uint8_t> pixels(bmpInfoHeader.imageSize);
     file.read(reinterpret_cast<char*>(pixels.data()), bmpInfoHeader.imageSize);
 
+    struct BMPFile* newBMPFile = (struct BMPFile*) malloc(sizeof(struct BMPFile));
+
+    newBMPFile->bmpHeader = bmpHeader;
+    newBMPFile->bmpInfoHeader = bmpInfoHeader;
+    newBMPFile->pixels = pixels;
+
     std::cout << "\nOpened file and read" << pixels.size() << std::endl;
-    return pixels;
+    return newBMPFile;
+}
+
+/**
+ * @brief Write a bitmap file to a file path
+ * 
+ * @param filePath 
+ * @param bmpFile 
+ */
+void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
+
+    const std::vector<uint8_t>& pixels = bmpFile.pixels;
+    const BMPHeader& bmpHeader = bmpFile.bmpHeader;
+    const BMPInfoHeader& bmpInfoHeader = bmpFile.bmpInfoHeader;
+
+    std::ofstream file(filePath, std::ios::binary);
+    
+    if (!file) {
+        std::cerr << "Error opening file for writing!" << std::endl;
+        exit(1);
+    }
+
+    // Write BMP header and BMP info header
+    file.write(reinterpret_cast<const char*>(&bmpHeader), sizeof(BMPHeader));
+    file.write(reinterpret_cast<const char*>(&bmpInfoHeader), sizeof(BMPInfoHeader));
+
+    // Write pixel data
+    file.write(reinterpret_cast<const char*>(pixels.data()), bmpInfoHeader.imageSize);
+
+    std::cout << "\nSaved file with " << pixels.size() << " pixels." << std::endl;
 }
