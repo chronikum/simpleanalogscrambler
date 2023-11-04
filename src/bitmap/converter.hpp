@@ -34,6 +34,7 @@ struct BMPInfoHeader {
 struct BMPFile {
 	BMPHeader bmpHeader;
 	BMPInfoHeader bmpInfoHeader;
+    std::vector<uint8_t> colorTable;  // Add this for the color table
 	std::vector<uint8_t> pixels;
 };
 

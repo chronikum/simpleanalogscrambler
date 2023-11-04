@@ -75,22 +75,31 @@ BMPFile* readGrayscaleBMPFile(const std::string& filePath) {
         exit(1);
     }
 
+    // Read the color table
+    std::vector<uint8_t> colorTable(256 * 4);
+    file.read(reinterpret_cast<char*>(colorTable.data()), 256 * 4);
+
     // Move the file pointer to the beginning of the pixel data
     file.seekg(bmpHeader.dataOffset);
 
-    // Read pixel data
-    std::vector<uint8_t> pixels(bmpInfoHeader.imageSize);
-    file.read(reinterpret_cast<char*>(pixels.data()), bmpInfoHeader.imageSize);
+    // Read pixel data with handling for padding
+    std::vector<uint8_t> pixels;
+    int padding = (4 - (bmpInfoHeader.width % 4)) % 4;
+    for (int i = 0; i < bmpInfoHeader.height; ++i) {
+        for (int j = 0; j < bmpInfoHeader.width; ++j) {
+            uint8_t pixel;
+            file.read(reinterpret_cast<char*>(&pixel), 1);
+            pixels.push_back(pixel);
+        }
+        file.seekg(padding, std::ios::cur);  // skip padding
+    }
 
-    struct BMPFile* newBMPFile = (struct BMPFile*) malloc(sizeof(struct BMPFile));
+    BMPFile* newBMPFile = new BMPFile;  // Using new instead of malloc for C++
 
     newBMPFile->bmpHeader = bmpHeader;
     newBMPFile->bmpInfoHeader = bmpInfoHeader;
+    newBMPFile->colorTable = colorTable;
     newBMPFile->pixels = pixels;
-
-    printOutPixelData(newBMPFile->pixels);
-    printOutHeader(newBMPFile->bmpHeader);
-    printOutInfoHeader(newBMPFile->bmpInfoHeader);
 
     std::cout << "\nOpened file and read \n" << newBMPFile->pixels.size() << std::endl;
     return newBMPFile;
@@ -107,12 +116,9 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
     const std::vector<uint8_t>& pixels = bmpFile.pixels;
     const BMPHeader& bmpHeader = bmpFile.bmpHeader;
     const BMPInfoHeader& bmpInfoHeader = bmpFile.bmpInfoHeader;
+    const std::vector<uint8_t>& colorTable = bmpFile.colorTable;  // Access the color table
 
     std::ofstream file(filePath, std::ios::binary);
-
-    printOutPixelData(pixels);
-    printOutHeader(bmpHeader);
-    printOutInfoHeader(bmpInfoHeader);
     
     if (!file) {
         std::cerr << "Error opening file for writing!" << std::endl;
@@ -123,8 +129,19 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
     file.write(reinterpret_cast<const char*>(&bmpHeader), sizeof(BMPHeader));
     file.write(reinterpret_cast<const char*>(&bmpInfoHeader), sizeof(BMPInfoHeader));
 
-    // Write pixel data
-    file.write(reinterpret_cast<const char*>(pixels.data()), bmpInfoHeader.imageSize);
+    // Write the color table
+    file.write(reinterpret_cast<const char*>(colorTable.data()), 256 * 4);
+
+    // Write pixel data with handling for padding
+    int padding = (4 - (bmpInfoHeader.width % 4)) % 4;
+    for (int i = 0; i < bmpInfoHeader.height; ++i) {
+        for (int j = 0; j < bmpInfoHeader.width; ++j) {
+            file.write(reinterpret_cast<const char*>(&pixels[i * bmpInfoHeader.width + j]), 1);
+        }
+        for (int p = 0; p < padding; ++p) {
+            file.put(0);  // write padding
+        }
+    }
 
     std::cout << "\nSaved file with " << pixels.size() << " pixels." << std::endl;
 
