@@ -160,21 +160,53 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
  * 
  * @param bmpFile 
  */
-void bitmapScramber(BMPFile* bmpFile) {
+void bitmapScrambler(BMPFile* bmpFile) {
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    // after reading the file, scramble the pixels line by line
+    std::default_random_engine engine(seed);
+
     int width = bmpFile->bmpInfoHeader.width;
     int height = bmpFile->bmpInfoHeader.height;
+
+    std::vector<std::vector<uint8_t> > lines(height);
+
+    // Copy the pixel data into the lines vector
+    for (int i = 0; i < height; i++) {
+        lines[i].resize(width);
+        for (int j = 0; j < width; j++) {
+            lines[i][j] = bmpFile->pixels[i * width + j];
+        }
+    }
+
+    // Shuffle the order of the lines
+    shuffle(lines.begin(), lines.end(), engine);
+
+    // Copy the shuffled lines back to the pixel data
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            bmpFile->pixels[i * width + j] = lines[i][j];
+        }
+    }
+}
+
+/**
+ * @brief Find lines that are similar to each other and swap them
+ * 
+ */
+void shuffleBack(BMPFile *file) {
+    int width = file->bmpInfoHeader.width;
+    int height = file->bmpInfoHeader.height;
 
     for (int i = 0; i < height; i++) {
         std::vector<uint8_t> line(width);
         for (int j = 0; j < width; j++) {
-            line[j] = bmpFile->pixels[i * width + j];
+            line[j] = file->pixels[i * width + j];
         }
-        // random shuffle
-        shuffle (line.begin(), line.end(), std::default_random_engine(seed));
+
+        // sort the line
+        std::sort(line.begin(), line.end());
+
         for (int j = 0; j < width; j++) {
-            bmpFile->pixels[i * width + j] = line[j];
+            file->pixels[i * width + j] = line[j];
         }
     }
 }

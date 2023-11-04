@@ -25,7 +25,9 @@ int main(int argc, char** argv) {
 	BMPFile *bmpFile = readGrayscaleBMPFile(currentPath);
 	std::cout << "====================" << std::endl;
 
-	bitmapScramber(bmpFile);
+	bitmapScrambler(bmpFile);
+
+	shuffleBack(bmpFile);
 
 	writeGrayscaleBMP(writePath, *bmpFile);
 
