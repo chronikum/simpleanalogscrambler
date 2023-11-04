@@ -105,6 +105,9 @@ BMPFile* readGrayscaleBMPFile(const std::string& filePath) {
     newBMPFile->colorTable = colorTable;
     newBMPFile->pixels = pixels;
 
+    printOutHeader(bmpHeader);
+    printOutInfoHeader(bmpInfoHeader);
+
     std::cout << "\nOpened file and read \n" << newBMPFile->pixels.size() << std::endl;
     return newBMPFile;
 }

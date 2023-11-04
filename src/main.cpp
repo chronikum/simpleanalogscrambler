@@ -8,7 +8,15 @@ struct RGB {
 };
 
 
-int main() {
+int main(int argc, char** argv) {
+
+	std::string writePath = "./assets/test3.bmp";
+
+	if (argv[1] == NULL) {
+		std::cout << "No file path provided, using default" << std::endl;
+	} else {
+		writePath = argv[1];
+	}
 
 	const char* currentPath = "./assets/test.bmp";
 
@@ -19,7 +27,7 @@ int main() {
 
 	bitmapScramber(bmpFile);
 
-	writeGrayscaleBMP("./assets/test3.bmp", *bmpFile);
+	writeGrayscaleBMP(writePath, *bmpFile);
 
 	return (0);
 }
