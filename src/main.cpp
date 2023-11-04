@@ -25,8 +25,11 @@ int main() {
 
 	const char* currentPath = "./assets/test.bmp";
 
-	std::vector<uint8_t> pixels = readGrayscaleBMP(currentPath);
+	BMPFile *bmpFile = readGrayscaleBMPFile(currentPath);
 
+	std::cout << "====================" << std::endl;
+
+	writeGrayscaleBMP("./assets/test3.bmp", *bmpFile);
 
 	return (0);
 }

@@ -2,6 +2,18 @@
 
 
 /**
+ * @brief Printing out the pixel data
+ * 
+ * @param pixels 
+ */
+void printOutPixelData(const std::vector<uint8_t>& pixels) {
+    for (int i = 0; i < pixels.size(); i++) {
+        std::cout << (int) pixels[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+/**
  * @brief Reads a bitmap file from a file path
  * - Does not allocate memory for the pixels. Please copy the return value to a allocated vector or array.
  * 
@@ -41,7 +53,9 @@ BMPFile* readGrayscaleBMPFile(const std::string& filePath) {
     newBMPFile->bmpInfoHeader = bmpInfoHeader;
     newBMPFile->pixels = pixels;
 
-    std::cout << "\nOpened file and read" << pixels.size() << std::endl;
+    printOutPixelData(newBMPFile->pixels);
+
+    std::cout << "\nOpened file and read \n" << newBMPFile->pixels.size() << std::endl;
     return newBMPFile;
 }
 
@@ -58,6 +72,8 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
     const BMPInfoHeader& bmpInfoHeader = bmpFile.bmpInfoHeader;
 
     std::ofstream file(filePath, std::ios::binary);
+
+    printOutPixelData(pixels);
     
     if (!file) {
         std::cerr << "Error opening file for writing!" << std::endl;
@@ -72,4 +88,6 @@ void writeGrayscaleBMP(const std::string& filePath, const BMPFile &bmpFile) {
     file.write(reinterpret_cast<const char*>(pixels.data()), bmpInfoHeader.imageSize);
 
     std::cout << "\nSaved file with " << pixels.size() << " pixels." << std::endl;
+
+    file.close();
 }
