@@ -1,6 +1,6 @@
 ## Analog Scrambler
 
-### Basic Analog Descrambler
+### Basic Analog Scrambler
 
 The objective of this project is to recreate the PAL scrambler used in analog television systems. The original system functioned as a form of "encryption," where the image lines were rearranged to block unauthorized viewing of television content.
 
