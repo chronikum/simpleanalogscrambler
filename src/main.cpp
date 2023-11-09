@@ -27,8 +27,6 @@ int main(int argc, char** argv) {
 
 	bitmapScrambler(bmpFile);
 
-	shuffleBack(bmpFile);
-
 	writeGrayscaleBMP(writePath, *bmpFile);
 
 	return (0);

@@ -187,26 +187,3 @@ void bitmapScrambler(BMPFile* bmpFile) {
         }
     }
 }
-
-/**
- * @brief Find lines that are similar to each other and swap them
- * 
- */
-void shuffleBack(BMPFile *file) {
-    int width = file->bmpInfoHeader.width;
-    int height = file->bmpInfoHeader.height;
-
-    for (int i = 0; i < height; i++) {
-        std::vector<uint8_t> line(width);
-        for (int j = 0; j < width; j++) {
-            line[j] = file->pixels[i * width + j];
-        }
-
-        // sort the line
-        std::sort(line.begin(), line.end());
-
-        for (int j = 0; j < width; j++) {
-            file->pixels[i * width + j] = line[j];
-        }
-    }
-}
